@@ -13,7 +13,7 @@ pico_sdk_init()
 
 add_subdirectory(lib/epaper)
 
-set(QUOTE_SCREEN_SOURCES src/main.c)
+set(QUOTE_SCREEN_SOURCES src/main.c src/display.c)
 add_executable(quote_screen ${QUOTE_SCREEN_SOURCES})
 
 target_include_directories(quote_screen PRIVATE include)
