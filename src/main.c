@@ -17,7 +17,7 @@ int main() {
 
   if (init_display() != 0)
     return -1;
-  print_message(message);
+  print_message(message, "Mom xxx", "");
 
   while (true)
     ;

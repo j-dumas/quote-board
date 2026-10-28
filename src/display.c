@@ -1,11 +1,14 @@
 #include <epaper/DEV_Config.h>
 #include <epaper/EPD_4in2_V2.h>
 #include <epaper/GUI_Paint.h>
+#include <epaper/fonts.h>
 #include <stdlib.h>
+#include <string.h>
 
 // For Font12
-#define MAX_CHAR_FONT12 (EPD_4IN2_V2_WIDTH / Font12.Width)
 #define LINE_HEIGHT_FONT12 (Font12.Height)
+#define MAX_CHAR_FONT12 (EPD_4IN2_V2_WIDTH / Font12.Width)
+#define MAX_LINE_FONT12 (EPD_4IN2_V2_HEIGHT / Font12.Height)
 
 static UBYTE *ImageBuf;
 
@@ -59,15 +62,26 @@ static UWORD draw_quote(const char *text) {
 
   return y;
 }
+
+static void draw_cite(const char *author, const char *book, const UWORD y) {
+  const UWORD cite_y = y + Font12.Height;
+  char line[100];
+  if (book[0] == '\0')
+    snprintf(line, 100, "  - %s", author);
+  else
+    snprintf(line, 100, "  - %s, %s", author, book);
+  Paint_DrawString_EN(0, cite_y, line, &Font12, BLACK, WHITE);
 }
 
-void print_message(char *message) {
+void print_message(const char *quote, const char *author, const char *book) {
   printf("Paint_NewImage\r\n");
   Paint_NewImage(ImageBuf, EPD_4IN2_V2_WIDTH, EPD_4IN2_V2_HEIGHT, 0, WHITE);
   Paint_SelectImage(ImageBuf);
   Paint_Clear(WHITE);
 
   UWORD y = draw_quote(quote);
+  draw_cite(author, book, y);
+
   EPD_4IN2_V2_Display_Fast(ImageBuf);
   EPD_4IN2_V2_Sleep();
 }
