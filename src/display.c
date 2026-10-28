@@ -34,8 +34,31 @@ int init_display() {
   return 0;
 }
 
-void draw_text(char *message) {
+static UWORD draw_line(UWORD y, char *line, uint8_t i) {
+  line[i] = '\0';
+  Paint_DrawString_EN(0, y, line, &Font12, BLACK, WHITE);
+  return y + Font12.Height;
+}
 
+static UWORD draw_quote(const char *text) {
+  UWORD y = 0;
+  char line[MAX_CHAR_FONT12];
+  uint8_t i = 0;
+  for (const char *p = text; *p; p++) {
+    if (*p == '\n' || i == MAX_CHAR_FONT12 - 1) {
+      y = draw_line(y, line, i);
+      i = 0;
+      if (*p == '\n')
+        continue;
+    }
+    line[i++] = *p;
+  }
+
+  if (i > 0)
+    y = draw_line(y, line, i);
+
+  return y;
+}
 }
 
 void print_message(char *message) {
@@ -44,7 +67,7 @@ void print_message(char *message) {
   Paint_SelectImage(ImageBuf);
   Paint_Clear(WHITE);
 
-  Paint_DrawString_EN(0, 0, message, &Font12, BLACK, WHITE);
+  UWORD y = draw_quote(quote);
   EPD_4IN2_V2_Display_Fast(ImageBuf);
   EPD_4IN2_V2_Sleep();
 }
