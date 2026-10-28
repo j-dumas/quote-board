@@ -2,6 +2,7 @@
 #include <epaper/EPD_4in2_V2.h>
 #include <epaper/GUI_Paint.h>
 #include <epaper/fonts.h>
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -46,14 +47,29 @@ static UWORD draw_line(UWORD y, char *line, uint8_t i) {
 static UWORD draw_quote(const char *text) {
   UWORD y = 0;
   char line[MAX_CHAR_FONT12];
-  uint8_t i = 0;
+  uint8_t i = 0, last_space_line = 0;
+  int last_space_text = 0;
+
   for (const char *p = text; *p; p++) {
-    if (*p == '\n' || i == MAX_CHAR_FONT12 - 1) {
+    if (*p == ' ') {
+      last_space_text = p - text;
+      last_space_line = i;
+    }
+
+    if (*p == '\n') {
       y = draw_line(y, line, i);
       i = 0;
-      if (*p == '\n')
-        continue;
+      last_space_line = 0;
+      continue;
     }
+
+    if (i == MAX_CHAR_FONT12 - 1) {
+      i = last_space_line;
+      y = draw_line(y, line, i);
+      i = 0;
+      p = text + last_space_text + 1;
+    }
+
     line[i++] = *p;
   }
 
